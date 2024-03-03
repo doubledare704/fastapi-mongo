@@ -1,19 +1,27 @@
-version: "3"
+version: '3.8'
 
 services:
   web:
-    build: .
+    build: ./backend
+    command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
+    volumes:
+      - ./backend:/usr/src/app
     ports:
-      - "8080:8080"
+      - "8005:8000"
     env_file:
-      - .env.docker-compose
+      - .env.dev
+    depends_on:
+      - mongodb
 
   mongodb:
-    image: bitnami/mongodb:latest
+    image: mongo:latest
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongo_user
+      - MONGO_INITDB_ROOT_PASSWORD=mongo_pass
     ports:
-      - "27017"
+      - '27017:27017'
     volumes:
-      - data:/bitnami/mongodb
+      - data:/data/db
 
 
 volumes:

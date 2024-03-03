@@ -1,12 +1,14 @@
-from pydantic import BaseModel, EmailStr
 from typing import Optional, Any
 
+from pydantic import BaseModel, EmailStr, Field
+
+
 class UpdateStudentModel(BaseModel):
-    fullname: Optional[str]
-    email: Optional[EmailStr]
-    course_of_study: Optional[str]
-    year: Optional[int]
-    gpa: Optional[float]
+    fullname: Optional[str] = Field(None, alias='fullname')
+    email: Optional[EmailStr] = Field(None, alias='email')
+    course_of_study: Optional[str] = Field(None, alias='course_of_study')
+    year: Optional[int] = Field(None, alias='year')
+    gpa: Optional[float] = Field(None, alias='gpa')
 
     class Collection:
         name = "student"
@@ -21,6 +23,7 @@ class UpdateStudentModel(BaseModel):
                 "gpa": "5.0",
             }
         }
+
 
 class Response(BaseModel):
     status_code: int

@@ -1,16 +1,16 @@
-from fastapi import APIRouter, Body
+from beanie import PydanticObjectId
+from fastapi import APIRouter, Body, Depends
 
-from database.database import *
-from models.student import Student
-from schemas.student import Response, UpdateStudentModel
-
+from app.models import Student
+from app.repositories import StudentRepository
+from app.schemas.student import Response, UpdateStudentModel
 
 router = APIRouter()
 
 
 @router.get("/", response_description="Students retrieved", response_model=Response)
-async def get_students():
-    students = await retrieve_students()
+async def get_students(sr: StudentRepository = Depends(StudentRepository)):
+    students = await sr.retrieve_students()
     return {
         "status_code": 200,
         "response_type": "success",
@@ -19,9 +19,9 @@ async def get_students():
     }
 
 
-@router.get("/{id}", response_description="Student data retrieved", response_model=Response)
-async def get_student_data(id: PydanticObjectId):
-    student = await retrieve_student(id)
+@router.get("/{student_id}", response_description="Student data retrieved", response_model=Response)
+async def get_student_data(student_id: PydanticObjectId, sr: StudentRepository = Depends(StudentRepository)):
+    student = await sr.retrieve_student(student_id)
     if student:
         return {
             "status_code": 200,
@@ -41,8 +41,8 @@ async def get_student_data(id: PydanticObjectId):
     response_description="Student data added into the database",
     response_model=Response,
 )
-async def add_student_data(student: Student = Body(...)):
-    new_student = await add_student(student)
+async def add_student_data(student: Student = Body(...), sr: StudentRepository = Depends(StudentRepository)):
+    new_student = await sr.add_student(student)
     return {
         "status_code": 200,
         "response_type": "success",
@@ -51,9 +51,9 @@ async def add_student_data(student: Student = Body(...)):
     }
 
 
-@router.delete("/{id}", response_description="Student data deleted from the database")
-async def delete_student_data(id: PydanticObjectId):
-    deleted_student = await delete_student(id)
+@router.delete("/{student_id}", response_description="Student data deleted from the database")
+async def delete_student_data(student_id: PydanticObjectId, sr: StudentRepository = Depends(StudentRepository)):
+    deleted_student = await sr.delete_student(student_id)
     if deleted_student:
         return {
             "status_code": 200,
@@ -69,19 +69,23 @@ async def delete_student_data(id: PydanticObjectId):
     }
 
 
-@router.put("/{id}", response_model=Response)
-async def update_student(id: PydanticObjectId, req: UpdateStudentModel = Body(...)):
-    updated_student = await update_student_data(id, req.dict())
+@router.patch("/{student_id}", response_model=Response)
+async def update_student(
+        student_id: PydanticObjectId,
+        req: UpdateStudentModel,
+        sr: StudentRepository = Depends(StudentRepository)
+):
+    updated_student = await sr.update_student_data(student_id, req.model_dump(exclude_none=True))
     if updated_student:
         return {
             "status_code": 200,
             "response_type": "success",
-            "description": "Student with ID: {} updated".format(id),
+            "description": "Student with ID: {} updated".format(student_id),
             "data": updated_student,
         }
     return {
         "status_code": 404,
         "response_type": "error",
-        "description": "An error occurred. Student with ID: {} not found".format(id),
+        "description": "An error occurred. Student with ID: {} not found".format(student_id),
         "data": False,
     }
