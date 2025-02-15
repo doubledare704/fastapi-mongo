@@ -4,6 +4,7 @@ from app.auth.jwt_bearer import JWTBearer
 from app.config import initiate_database
 from app.routes import admin
 from app.routes import student
+from app.routes import aerospike_routes
 
 app = FastAPI()
 
@@ -22,3 +23,4 @@ async def read_root():
 
 app.include_router(admin.router, tags=["Administrator"], prefix="/admin")
 app.include_router(student.router, tags=["Students"], prefix="/student", dependencies=[Depends(token_listener)], )
+app.include_router(aerospike_routes.router, tags=["Aerospike"], prefix="/aerospike")

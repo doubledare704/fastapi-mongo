@@ -1,1 +1,1 @@
-from .config import initiate_database, Settings
+from .config import initiate_database, Settings, settings

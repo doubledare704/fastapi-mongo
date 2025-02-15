@@ -1,6 +1,15 @@
 version: '3.8'
 
 services:
+  aerospike:
+    image: aerospike/aerospike-server
+    container_name: aerospike
+    ports:
+      - "3000:3000"  # Default service port
+      - "3001:3001"  # Fabric port (internal cluster communication)
+      - "3002:3002"  # Fabric port (internal cluster communication)
+    volumes:
+      - aerospike_data:/opt/aerospike/data
   web:
     build: ./backend
     command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
@@ -12,6 +21,10 @@ services:
       - .env.dev
     depends_on:
       - mongodb
+      - aerospike
+    environment:
+      AEROSPIKE_HOST: aerospike
+      AEROSPIKE_PORT: 3000
 
   mongodb:
     image: mongo:latest
@@ -26,3 +39,4 @@ services:
 
 volumes:
   data:
+  aerospike_data:

@@ -1,6 +1,7 @@
 __all__ = (
     "initiate_database",
-    "Settings"
+    "Settings",
+    "settings"
 )
 
 from typing import Optional
@@ -15,6 +16,8 @@ from app import models as models
 class Settings(BaseSettings):
     # database configurations
     DATABASE_URL: Optional[str] = None
+    AEROSPIKE_HOST: Optional[str] = "127.0.0.1"
+    AEROSPIKE_PORT: Optional[int] = 3000
 
     # JWT
     secret_key: str = "secret"
@@ -30,3 +33,7 @@ async def initiate_database():
     await init_beanie(
         database=client.get_default_database(), document_models=models.__all__
     )
+
+
+def settings():
+    return Settings()
