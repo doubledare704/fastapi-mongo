@@ -17,7 +17,7 @@ async def admin_login(admin_credentials: AdminSignIn = Body(...), ar: AdminRepos
     if admin_exists:
         password = hash_helper.verify(admin_credentials.password, admin_exists.password)
         if password:
-            return sign_jwt(admin_credentials.username)
+            return sign_jwt(str(admin_credentials.username))  # Convert EmailStr to str
 
         raise HTTPException(status_code=403, detail="Incorrect email or password")
 
@@ -26,7 +26,7 @@ async def admin_login(admin_credentials: AdminSignIn = Body(...), ar: AdminRepos
 
 @router.post("/signup", response_model=AdminData)
 async def admin_signup(admin: Admin = Body(...), ar: AdminRepository = Depends(AdminRepository)):
-    admin_exists = await ar.get_admin(email=admin.email)
+    admin_exists = await ar.get_admin(email=str(admin.email))
     if admin_exists:
         raise HTTPException(
             status_code=409, detail="Admin with email supplied already exists"

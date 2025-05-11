@@ -1,4 +1,4 @@
-__all__ = ('AdminRepository')
+__all__ = ['AdminRepository']
 
 from app.models import Admin
 
@@ -7,7 +7,8 @@ class AdminRepository:
     def __init__(self):
         self.collection = Admin
 
-    async def add_admin(self, new_admin: Admin) -> Admin:
+    @staticmethod
+    async def add_admin(new_admin: Admin) -> Admin:
         admin = await new_admin.create()
         return admin
 

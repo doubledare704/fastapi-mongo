@@ -4,13 +4,13 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from .jwt_handler import decode_jwt
 
 
-def verify_jwt(jwtoken: str) -> bool:
-    isTokenValid: bool = False
+def verify_jwt(jwt_token: str) -> bool:
+    is_token_valid: bool = False
 
-    payload = decode_jwt(jwtoken)
+    payload = decode_jwt(jwt_token)
     if payload:
-        isTokenValid = True
-    return isTokenValid
+        is_token_valid = True
+    return is_token_valid
 
 
 class JWTBearer(HTTPBearer):
